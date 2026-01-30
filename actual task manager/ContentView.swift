@@ -7,35 +7,92 @@
 
 import SwiftUI
 
+struct TaskItem: Identifiable, Hashable {
+    let id = UUID()
+    var title: String
+    var isDone: Bool = false
+}
+
+struct TaskDetailView: View {
+    @Binding var task: TaskItem
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text(task.title)
+                .font(.title)
+                .padding(.top)
+
+            Text(task.isDone ? "Status: ✅ Finished" : "Status: ❌ Not finished")
+                .font(.headline)
+                .foregroundStyle(task.isDone ? .green : .red)
+
+            HStack(spacing: 16) {
+                Button {
+                    task.isDone = true
+                } label: {
+                    Text("Yes, finished ✅")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button {
+                    task.isDone = false
+                } label: {
+                    Text("No, not yet ❌")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding(.horizontal)
+
+            Spacer()
+        }
+        .navigationTitle("Task")
+    }
+}
+
 struct ContentView: View {
-    @State var tasks: [String] = ["Play HSR", "Pack desk"]
-    @State var importantTasks: [String] = ["homework", "Buy groceries", "do ict"]
+    @State var tasks: [TaskItem] = [
+        TaskItem(title: "Play HSR"),
+        TaskItem(title: "Pack desk")
+    ]
+    @State var importantTasks: [TaskItem] = [
+        TaskItem(title: "homework"),
+        TaskItem(title: "Buy groceries"),
+        TaskItem(title: "do ict")
+    ]
 
     var body: some View {
         NavigationStack {
-            List {                   
+            List {
                 Section("Important Tasks") {
-                    ForEach(importantTasks, id: \.self) { item in
-                        NavigationLink(destination: Text(item).padding()) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item)
-                                    .foregroundStyle(.red)
-                                Text("VERY IMPORTANT!!")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                    ForEach($importantTasks) { $item in
+                        NavigationLink(destination: TaskDetailView(task: $item)) {
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                Text(item.isDone ? "✅" : "❌")
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(item.title)
+                                        .foregroundStyle(.red)
+                                    Text("VERY IMPORTANT!!")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
                 }
                 Section("Tasks") {
-                    ForEach(tasks, id: \.self) { item in
-                        NavigationLink(destination: Text(item).padding()) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item)
-                                    .foregroundStyle(.blue)
-                                Text("Tasks")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                    ForEach($tasks) { $item in
+                        NavigationLink(destination: TaskDetailView(task: $item)) {
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                Text(item.isDone ? "✅" : "❌")
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(item.title)
+                                        .foregroundStyle(.blue)
+                                    Text("Tasks")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
