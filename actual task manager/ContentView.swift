@@ -32,6 +32,8 @@ struct TaskDetailView: View {
                 .textFieldStyle(.roundedBorder)
                 .font(.title2)
                 .padding(.top)
+                .strikethrough(task.isDone, color: .primary.opacity(0.6))
+                .foregroundStyle(task.isDone ? .secondary : .primary)
 
             Text(task.isDone ? "Status: ✅ Finished" : "Status: ❌ Not finished")
                 .font(.headline)
@@ -60,24 +62,11 @@ struct TaskDetailView: View {
             }
             .textCase(nil)
 
-            HStack(spacing: 16) {
-                Button {
-                    task.isDone = true
-                } label: {
-                    Text("Yes, finished ✅")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-
-                Button {
-                    task.isDone = false
-                } label: {
-                    Text("No, not yet ❌")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
+            Toggle(isOn: $task.isDone) {
+                Text("Completed")
             }
             .padding(.horizontal)
+            .toggleStyle(.switch)
 
             Spacer()
         }
@@ -86,11 +75,12 @@ struct TaskDetailView: View {
 }
 
 struct ContentView: View {
+    
     @State var tasks: [TaskItem] = [
         TaskItem(title: "homework", isDone: false, isImportant: true, dueDate: nil),
         TaskItem(title: "Buy groceries", isDone: false, isImportant: true, dueDate: nil),
         TaskItem(title: "do ict", isDone: false, isImportant: true, dueDate: nil),
-        TaskItem(title: "Play HSR", isDone: false, isImportant: false, dueDate: nil),
+        TaskItem(title: "eat", isDone: false, isImportant: false, dueDate: nil),
         TaskItem(title: "Pack desk", isDone: false, isImportant: false, dueDate: nil)
     ]
     
@@ -108,16 +98,20 @@ struct ContentView: View {
                         let binding = $tasks[index]
                         NavigationLink(destination: TaskDetailView(task: binding)) {
                             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                                Text(binding.wrappedValue.isDone ? "✅" : "❌")
+                                Button(action: { binding.isDone.wrappedValue.toggle() }) {
+                                    Text(binding.wrappedValue.isDone ? "✅" : "❌")
+                                }
+                                .buttonStyle(.plain)
                                 VStack(alignment: .leading, spacing: 2) {
                                     HStack {
                                         Text(binding.wrappedValue.title)
-                                            .foregroundStyle(.red)
+                                            .strikethrough(binding.wrappedValue.isDone, color: .primary.opacity(0.6))
+                                            .foregroundStyle(.red.opacity(binding.wrappedValue.isDone ? 0.6 : 1.0))
                                         Image(systemName: "star.fill").foregroundStyle(.yellow)
                                     }
                                     Text("Due: \(binding.wrappedValue.formattedDueDate)")
                                         .font(.subheadline)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(binding.wrappedValue.isDone ? .tertiary : .secondary)
                                 }
                             }
                         }
@@ -133,13 +127,17 @@ struct ContentView: View {
                         let binding = $tasks[index]
                         NavigationLink(destination: TaskDetailView(task: binding)) {
                             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                                Text(binding.wrappedValue.isDone ? "✅" : "❌")
+                                Button(action: { binding.isDone.wrappedValue.toggle() }) {
+                                    Text(binding.wrappedValue.isDone ? "✅" : "❌")
+                                }
+                                .buttonStyle(.plain)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(binding.wrappedValue.title)
-                                        .foregroundStyle(.blue)
+                                        .strikethrough(binding.wrappedValue.isDone, color: .primary.opacity(0.6))
+                                        .foregroundStyle(.blue.opacity(binding.wrappedValue.isDone ? 0.6 : 1.0))
                                     Text("Due: \(binding.wrappedValue.formattedDueDate)")
                                         .font(.subheadline)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(binding.wrappedValue.isDone ? .tertiary : .secondary)
                                 }
                             }
                         }
